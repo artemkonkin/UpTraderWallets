@@ -5,17 +5,17 @@ namespace UTWalletsWebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+public class EthController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<EthController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public EthController(ILogger<EthController> logger)
     {
         _logger = logger;
     }
 
     [HttpGet(Name = "get-balance")]
-    public async Task GetBalance()
+    public async Task GetBalance(string walletNumber)
     {
         var client = new HttpClient();
         
@@ -27,7 +27,7 @@ public class WeatherForecastController : ControllerBase
             {
                 { "accept", "application/json" },
             },
-            Content = new StringContent("{\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[\"0xe5cB067E90D5Cd1F8052B83562Ae670bA4A211a8\",\"latest\"],\"method\":\"eth_getBalance\"}")
+            Content = new StringContent("{\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[\"{walletNumber}\",\"latest\"],\"method\":\"eth_getBalance\"}")
             {
                 Headers =
                 {
@@ -35,12 +35,11 @@ public class WeatherForecastController : ControllerBase
                 }
             }
         };
-        
-        using (var response = await client.SendAsync(request))
-        {
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(body);
-        };
+
+        using var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(body);
+        ;
     }
 }
